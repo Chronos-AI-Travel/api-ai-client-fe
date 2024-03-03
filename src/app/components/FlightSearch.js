@@ -6,10 +6,48 @@ const FlightSearch = ({ onSearch }) => {
   const [to, setTo] = useState("");
   const [departDate, setDepartDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [travelers, setTravelers] = useState(1); // Default to 1 traveler
+  const [travelers, setTravelers] = useState(1);
+  const [offers, setOffers] = useState([]); // State to store fetched offers
 
-  const handleSearchClick = () => {
-    onSearch(from, to, departDate, returnDate, travelers);
+  const handleSearchClick = async () => {
+    const postData = {
+      data: {
+        // Ensure this matches the backend's expected structure
+        slices: [
+          {
+            origin: from, // Assuming 'from' is your origin IATA code
+            destination: to, // Assuming 'to' is your destination IATA code
+            departure_date: departDate, // Format: "YYYY-MM-DD"
+          },
+        ],
+        passengers: [
+          {
+            type: "adult", // Adjust based on your requirements
+          },
+        ],
+        // Include any other necessary fields as required by your specific request
+      },
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/get_flight_offers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setOffers(data); // Store the fetched offers in state
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to fetch flight offers:", error);
+    }
   };
 
   return (
@@ -17,7 +55,10 @@ const FlightSearch = ({ onSearch }) => {
       <div className="flex flex-wrap mx-2 items-end">
         {/* From input */}
         <div className="px-2 w-1/5 mb-4">
-          <label htmlFor="originField" className="block mb-1 text-xs font-medium text-gray-900">
+          <label
+            htmlFor="originField"
+            className="block mb-1 text-xs font-medium text-gray-900"
+          >
             From
           </label>
           <input
@@ -32,7 +73,10 @@ const FlightSearch = ({ onSearch }) => {
         </div>
         {/* To input */}
         <div className="px-2 w-1/5 mb-4">
-          <label htmlFor="destinationField" className="block mb-1 text-xs font-medium text-gray-900">
+          <label
+            htmlFor="destinationField"
+            className="block mb-1 text-xs font-medium text-gray-900"
+          >
             To
           </label>
           <input
@@ -47,7 +91,10 @@ const FlightSearch = ({ onSearch }) => {
         </div>
         {/* Depart date input */}
         <div className="px-2 w-1/5 mb-4">
-          <label htmlFor="departField" className="block mb-1 text-xs font-medium text-gray-900">
+          <label
+            htmlFor="departField"
+            className="block mb-1 text-xs font-medium text-gray-900"
+          >
             Depart
           </label>
           <input
@@ -61,7 +108,10 @@ const FlightSearch = ({ onSearch }) => {
         </div>
         {/* Return date input */}
         <div className="px-2 w-1/5 mb-4">
-          <label htmlFor="returnField" className="block mb-1 text-xs font-medium text-gray-900">
+          <label
+            htmlFor="returnField"
+            className="block mb-1 text-xs font-medium text-gray-900"
+          >
             Return
           </label>
           <input
@@ -75,7 +125,10 @@ const FlightSearch = ({ onSearch }) => {
         </div>
         {/* Travelers select */}
         <div className="px-2 w-24 mb-4">
-          <label htmlFor="travelersField" className="block mb-1 text-xs font-medium text-gray-900">
+          <label
+            htmlFor="travelersField"
+            className="block mb-1 text-xs font-medium text-gray-900"
+          >
             Travelers
           </label>
           <select
@@ -102,6 +155,20 @@ const FlightSearch = ({ onSearch }) => {
             Search
           </button>
         </div>
+      </div>
+      <div>
+        {offers && offers.length > 0 ? (
+          offers.map((offer, index) => (
+            <div key={index} className="offer">
+              <p>
+                Price: {offer.total_amount} {offer.total_currency}
+              </p>
+              <p>Airline: {offer.airline}</p>
+            </div>
+          ))
+        ) : (
+          <p>No offers available</p>
+        )}
       </div>
     </div>
   );
