@@ -1,31 +1,37 @@
 "use client";
+import {
+  faEllipsisH,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
-const FlightSearch = ({ onSearch }) => {
+const FlightSearch = ({ onOffersUpdate }) => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departDate, setDepartDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [travelers, setTravelers] = useState(1);
-  const [offers, setOffers] = useState([]); // State to store fetched offers
+  const [adultPassengers, setAdultPassengers] = useState(1);
+  const [childPassengers, setChildPassengers] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearchClick = async () => {
+    setIsLoading(true);
+    const passengers = [
+      ...Array(adultPassengers).fill({ type: "adult" }),
+      ...Array(childPassengers).fill({ type: "child" }),
+    ];
+
     const postData = {
       data: {
-        // Ensure this matches the backend's expected structure
         slices: [
           {
-            origin: from, // Assuming 'from' is your origin IATA code
-            destination: to, // Assuming 'to' is your destination IATA code
-            departure_date: departDate, // Format: "YYYY-MM-DD"
+            origin: from,
+            destination: to,
+            departure_date: departDate,
           },
         ],
-        passengers: [
-          {
-            type: "adult", // Adjust based on your requirements
-          },
-        ],
-        // Include any other necessary fields as required by your specific request
+        passengers: passengers,
       },
     };
 
@@ -43,18 +49,21 @@ const FlightSearch = ({ onSearch }) => {
       }
 
       const data = await response.json();
-      setOffers(data); // Store the fetched offers in state
-      console.log(data);
+      console.log("Received data:", data); // Log the received data
+
+      onOffersUpdate(data);
     } catch (error) {
       console.error("Failed to fetch flight offers:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto text-left border-2 border-black p-4 rounded-lg bg-white">
-      <div className="flex flex-wrap mx-2 items-end">
+    <div className="w-full max-w-6xl border-2 border-black p-4 items-center justify-between rounded-lg flex flex-row bg-white">
+      <div className="flex flex-grow items-start">
         {/* From input */}
-        <div className="px-2 w-1/5 mb-4">
+        <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="originField"
             className="block mb-1 text-xs font-medium text-gray-900"
@@ -72,7 +81,7 @@ const FlightSearch = ({ onSearch }) => {
           />
         </div>
         {/* To input */}
-        <div className="px-2 w-1/5 mb-4">
+        <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="destinationField"
             className="block mb-1 text-xs font-medium text-gray-900"
@@ -90,7 +99,7 @@ const FlightSearch = ({ onSearch }) => {
           />
         </div>
         {/* Depart date input */}
-        <div className="px-2 w-1/5 mb-4">
+        <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="departField"
             className="block mb-1 text-xs font-medium text-gray-900"
@@ -107,7 +116,7 @@ const FlightSearch = ({ onSearch }) => {
           />
         </div>
         {/* Return date input */}
-        <div className="px-2 w-1/5 mb-4">
+        <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="returnField"
             className="block mb-1 text-xs font-medium text-gray-900"
@@ -124,51 +133,62 @@ const FlightSearch = ({ onSearch }) => {
           />
         </div>
         {/* Travelers select */}
-        <div className="px-2 w-24 mb-4">
+        <div className="px-2 w-full md:w-1/5 mb-4">
           <label
-            htmlFor="travelersField"
-            className="block mb-1 text-xs font-medium text-gray-900"
+            className="flex flex-col w-24 text-xs font-medium text-gray-900"
+            htmlFor="adultPassengers"
           >
-            Travelers
+            Passengers
           </label>
-          <select
-            id="travelersField"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            required
-            value={travelers}
-            onChange={(e) => setTravelers(e.target.value)}
-          >
-            {[...Array(10).keys()].map((number) => (
-              <option key={number} value={number + 1}>
-                {number + 1}
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Search button */}
-        <div className="px-2 w-28 rounded-lg mb-4 flex items-end px-2">
-          <button
-            type="button" // Use type="button" to prevent form submission if wrapped in a form
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full flex items-center justify-center"
-            onClick={handleSearchClick} // Trigger search on click
-          >
-            Search
-          </button>
+          <div htmlFor="passengerSelect" className="border-2 rounded-lg p-2 ">
+            <div className="text-sm flex items-center gap-2 mb-2">
+              <label className="flex flex-col w-24" htmlFor="adultPassengers">
+                Adults{" "}
+                <span className="font-light text-xs text-slate-400">
+                  (Aged 16+)
+                </span>
+              </label>
+              <input
+                type="number"
+                id="adultPassengers"
+                className="w-14 border rounded-lg p-2"
+                value={adultPassengers}
+                onChange={(e) => setAdultPassengers(Number(e.target.value))}
+                min="1" // Ensure there's at least one adult
+              />
+            </div>
+            <div className="text-sm flex items-center gap-2">
+              <label className="flex flex-col w-24" htmlFor="childPassengers">
+                Children{" "}
+                <span className="font-light text-xs text-slate-400">
+                  (Aged 0 to 15)
+                </span>
+              </label>
+              <input
+                type="number"
+                id="childPassengers"
+                className="w-14 border rounded-lg p-2"
+                value={childPassengers}
+                onChange={(e) => setChildPassengers(Number(e.target.value))}
+                min="0"
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <div>
-        {offers && offers.length > 0 ? (
-          offers.map((offer, index) => (
-            <div key={index} className="offer">
-              <p>
-                Price: {offer.total_amount} {offer.total_currency}
-              </p>
-              <p>Airline: {offer.airline}</p>
-            </div>
-          ))
-        ) : (
-          <p>No offers available</p>
-        )}
+      <div className="px-2 w-full md:w-auto">
+        <button
+          type="button"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold h-10 w-10 rounded flex items-center justify-center"
+          onClick={handleSearchClick}
+          disabled={isLoading} // Disable the button while loading
+        >
+          {isLoading ? (
+            <FontAwesomeIcon icon={faEllipsisH} />
+          ) : (
+            <FontAwesomeIcon icon={faMagnifyingGlass} />
+          )}
+        </button>
       </div>
     </div>
   );

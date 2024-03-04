@@ -5,6 +5,12 @@ import Logo from "./components/Logo";
 import SearchResults from "./components/SearchResults";
 
 export default function Home() {
+  const [offers, setOffers] = useState([]);
+
+  const handleOffersUpdate = (newOffers) => {
+    setOffers(newOffers);
+  };
+
   const [searchParams, setSearchParams] = useState({
     from: "",
     to: "",
@@ -46,10 +52,10 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-blue-50 gap-4 flex flex-col min-h-screen items-start justify-start px-16 py-8">
+    <main className="bg-blue-50 gap-2 flex flex-col min-h-screen items-start justify-start px-16 py-4">
       <Logo />
-      <FlightSearch onSearch={handleSearch} />
-      <SearchResults results={searchResults} />
+      <FlightSearch onOffersUpdate={handleOffersUpdate} />
+      <SearchResults results={offers} />
     </main>
   );
 }
