@@ -71,20 +71,20 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
   };
 
   return (
-    <div className="w-full max-w-6xl border-2 border-black p-4 items-center justify-between rounded-lg flex flex-row bg-white">
-      <div className="flex flex-grow items-start">
+    <div className="w-full max-w-6xl border-2 bg-slate-800 border-black p-4 items-center justify-between rounded-lg flex flex-row text-white">
+      <div className="flex flex-grow text-white items-start">
         {/* From input */}
         <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="originField"
-            className="block mb-1 text-xs font-medium text-gray-900"
+            className="block mb-1 text-xs font-medium"
           >
             From
           </label>
           <input
             type="text"
             id="originField"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="London (Any)"
             required
             value={from}
@@ -95,14 +95,14 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
         <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="destinationField"
-            className="block mb-1 text-xs font-medium text-gray-900"
+            className="block mb-1 text-xs font-medium0"
           >
             To
           </label>
           <input
             type="text"
             id="destinationField"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="Country, city or airport"
             required
             value={to}
@@ -113,14 +113,14 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
         <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="departField"
-            className="block mb-1 text-xs font-medium text-gray-900"
+            className="block mb-1 text-xs font-medium "
           >
             Depart
           </label>
           <input
             type="date"
             id="departField"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 text-slate-400 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
             value={departDate}
             onChange={(e) => setDepartDate(e.target.value)}
@@ -130,14 +130,14 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
         <div className="px-2 w-full md:w-1/5 mb-4">
           <label
             htmlFor="returnField"
-            className="block mb-1 text-xs font-medium text-gray-900"
+            className="block mb-1 text-xs font-medium"
           >
             Return
           </label>
           <input
             type="date"
             id="returnField"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 border border-gray-300 text-slate-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
@@ -146,7 +146,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
         {/* Travelers select */}
         <div className="px-2 w-full md:w-1/5 mb-4">
           <label
-            className="flex flex-col w-24 text-xs font-medium text-gray-900"
+            className="flex flex-col w-24 text-xs font-medium"
             htmlFor="adultPassengers"
           >
             Passengers
@@ -162,7 +162,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
               <input
                 type="number"
                 id="adultPassengers"
-                className="w-14 border rounded-lg p-2"
+                className="w-14 border text-slate-400 rounded-lg p-2"
                 value={adultPassengers}
                 onChange={(e) => setAdultPassengers(Number(e.target.value))}
                 min="1" // Ensure there's at least one adult
@@ -178,7 +178,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
               <input
                 type="number"
                 id="childPassengers"
-                className="w-14 border rounded-lg p-2"
+                className="w-14 border text-slate-400 rounded-lg p-2"
                 value={childPassengers}
                 onChange={(e) => setChildPassengers(Number(e.target.value))}
                 min="0"
@@ -190,7 +190,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
       <div className="px-2 w-full md:w-auto">
         <button
           type="button"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold h-10 w-10 rounded flex items-center justify-center"
+          className="bg-blue-500 border-2 border-white hover:bg-blue-700 text-white font-bold h-10 w-10 rounded flex items-center justify-center"
           onClick={handleSearchClick}
           disabled={isLoading} // Disable the button while loading
         >

@@ -18,7 +18,6 @@ const SearchResults = ({ results }) => {
     <div className="w-full max-w-6xl mx-auto text-left border-2 border-black p-4 rounded-lg bg-gray-50">
       <div className="font-semibold mb-2">Results</div>
       {results.map((offer, index) => {
-        // Assuming the first slice's total_amount represents the total for the entire offer
         const totalAmount = offer.slices[0].total_amount;
         const baseCurrency = offer.slices[0].base_currency;
         console.log(
@@ -33,7 +32,7 @@ const SearchResults = ({ results }) => {
             <div className="w-3/4">
               {offer.slices.map((slice, sliceIndex) => (
                 <React.Fragment key={sliceIndex}>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-around gap-4">
                     <p className="mx-4 text-xs w-20">
                       {slice.operating_carrier_name}
                     </p>
@@ -78,7 +77,9 @@ const SearchResults = ({ results }) => {
                 <p className="font-light text-xs text-slate-800">TOTAL</p>
                 <div className="flex gap-2 items-center">
                   <p className="">{totalAmount}</p>
-                  <span className="text-xs text-slate-500 ">{baseCurrency}</span>
+                  <span className="text-xs text-slate-500 ">
+                    {baseCurrency}
+                  </span>
                 </div>
               </div>
               <button
