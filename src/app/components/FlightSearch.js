@@ -84,7 +84,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
           <input
             type="text"
             id="originField"
-            className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 text-slate-600 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="London (Any)"
             required
             value={from}
@@ -102,7 +102,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
           <input
             type="text"
             id="destinationField"
-            className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 text-slate-600 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="Country, city or airport"
             required
             value={to}
@@ -120,7 +120,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
           <input
             type="date"
             id="departField"
-            className="bg-gray-50 text-slate-400 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 text-slate-600 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
             value={departDate}
             onChange={(e) => setDepartDate(e.target.value)}
@@ -137,7 +137,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
           <input
             type="date"
             id="returnField"
-            className="bg-gray-50 border border-gray-300 text-slate-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-50 border border-gray-300 text-slate-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
@@ -162,7 +162,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
               <input
                 type="number"
                 id="adultPassengers"
-                className="w-14 border text-slate-400 rounded-lg p-2"
+                className="w-14 border text-slate-600 rounded-lg p-2"
                 value={adultPassengers}
                 onChange={(e) => setAdultPassengers(Number(e.target.value))}
                 min="1" // Ensure there's at least one adult
@@ -178,7 +178,7 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
               <input
                 type="number"
                 id="childPassengers"
-                className="w-14 border text-slate-400 rounded-lg p-2"
+                className="w-14 border text-slate-600 rounded-lg p-2"
                 value={childPassengers}
                 onChange={(e) => setChildPassengers(Number(e.target.value))}
                 min="0"

@@ -1,8 +1,13 @@
 import { faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useState } from "react";
+import PassengerDetailsModal from "./PassengerDetailsModal";
 
 const SearchResults = ({ results }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
+
   console.log("searchResults results", results);
 
   const formatDuration = (start, end) => {
@@ -14,15 +19,42 @@ const SearchResults = ({ results }) => {
     return `${hours}h ${minutes}m`;
   };
 
+  const handleSelectOffer = (offerId) => {
+    const offer = results.find((o) => o.id === offerId);
+    if (offer) {
+      const passengerIds = offer.passenger_ids;
+      setSelectedPassengerIds(passengerIds);
+    }
+    setSelectedOfferId(offerId);
+    setIsModalOpen(true);
+  };
+
+  const handlePassengerDetailsSubmit = async (orderPayload) => {
+    try {
+      const response = await fetch("http://localhost:5000/create_order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Order created successfully:", data);
+      } else {
+        console.error("Failed to create order:", data);
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto text-left border-2 border-black p-4 rounded-lg bg-gray-50">
       <div className="font-semibold mb-2">Results</div>
       {results.map((offer, index) => {
         const totalAmount = offer.slices[0].total_amount;
         const baseCurrency = offer.slices[0].base_currency;
-        console.log(
-          `Offer ${index + 1} Total Price: ${totalAmount} ${baseCurrency}`
-        );
 
         return (
           <div
@@ -86,6 +118,7 @@ const SearchResults = ({ results }) => {
                 type="button"
                 className="bg-blue-500 gap-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center"
                 aria-label="Select flight"
+                onClick={() => handleSelectOffer(offer.id)} // Replace `offer.id` with the actual property path to the offer ID
               >
                 Select <FontAwesomeIcon icon={faChevronCircleRight} />
               </button>
@@ -93,6 +126,13 @@ const SearchResults = ({ results }) => {
           </div>
         );
       })}
+      <PassengerDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handlePassengerDetailsSubmit}
+        selectedOfferId={selectedOfferId}
+        passengerIds={selectedPassengerIds}
+      />
     </div>
   );
 };
