@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
-const FlightSearch = ({ onOffersUpdate }) => {
+const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departDate, setDepartDate] = useState("");
@@ -16,12 +16,14 @@ const FlightSearch = ({ onOffersUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearchClick = async () => {
+    onSearchStart();
     setIsLoading(true);
     const passengers = [
       ...Array(adultPassengers).fill({ type: "adult" }),
       ...Array(childPassengers).fill({ type: "child" }),
     ];
-
+  
+    // Initialize postData with the outbound slice
     const postData = {
       data: {
         slices: [
@@ -29,12 +31,21 @@ const FlightSearch = ({ onOffersUpdate }) => {
             origin: from,
             destination: to,
             departure_date: departDate,
-          },
+          }
         ],
         passengers: passengers,
       },
     };
-
+  
+    // If a return date is specified, add the return slice
+    if (returnDate) {
+      postData.data.slices.push({
+        origin: to, // For the return trip, the origin is the initial destination
+        destination: from, // And the destination is the initial origin
+        departure_date: returnDate,
+      });
+    }
+  
     try {
       const response = await fetch("http://localhost:5000/get_flight_offers", {
         method: "POST",
@@ -43,14 +54,14 @@ const FlightSearch = ({ onOffersUpdate }) => {
         },
         body: JSON.stringify(postData),
       });
-
+  
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+  
       const data = await response.json();
       console.log("Received data:", data); // Log the received data
-
+  
       onOffersUpdate(data);
     } catch (error) {
       console.error("Failed to fetch flight offers:", error);
