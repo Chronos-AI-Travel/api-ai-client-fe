@@ -7,6 +7,8 @@ const SearchResults = ({ results }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
   const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
+  const [selectedOfferPrice, setSelectedOfferPrice] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   console.log("searchResults results", results);
 
@@ -23,7 +25,9 @@ const SearchResults = ({ results }) => {
     const offer = results.find((o) => o.id === offerId);
     if (offer) {
       const passengerIds = offer.passenger_ids;
+      const totalAmount = offer.slices[0].total_amount; // Assuming the price is here
       setSelectedPassengerIds(passengerIds);
+      setSelectedOfferPrice(totalAmount); // Store the price in state
     }
     setSelectedOfferId(offerId);
     setIsModalOpen(true);
@@ -41,6 +45,8 @@ const SearchResults = ({ results }) => {
       const data = await response.json();
       if (response.ok) {
         console.log("Order created successfully:", data);
+        setShowSuccessMessage(true); // Show success message
+        setTimeout(() => setShowSuccessMessage(false), 3000); // Hide after 3 seconds
       } else {
         console.error("Failed to create order:", data);
       }
@@ -52,6 +58,7 @@ const SearchResults = ({ results }) => {
   return (
     <div className="w-full max-w-6xl mx-auto text-left border-2 border-black p-4 rounded-lg bg-gray-50">
       <div className="font-semibold mb-2">Results</div>
+      <div className="text-green-500 mb-2">Booked!</div>
       {results.map((offer, index) => {
         const totalAmount = offer.slices[0].total_amount;
         const baseCurrency = offer.slices[0].base_currency;
@@ -68,6 +75,7 @@ const SearchResults = ({ results }) => {
                     <p className="mx-4 text-xs w-20">
                       {slice.operating_carrier_name}
                     </p>
+
                     <div className="flex items-center">
                       <div className="flex justify-between flex-col">
                         <p className="mx-4 text-3xl">
@@ -132,6 +140,7 @@ const SearchResults = ({ results }) => {
         onSubmit={handlePassengerDetailsSubmit}
         selectedOfferId={selectedOfferId}
         passengerIds={selectedPassengerIds}
+        price={selectedOfferPrice} // Pass the price to the modal
       />
     </div>
   );
