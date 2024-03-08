@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import PassengerDetailsModal from "./PassengerDetailsModal";
 
-const SearchResults = ({ results }) => {
+const FlightSearchResults = ({ results }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
   const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
@@ -153,4 +153,4 @@ const SearchResults = ({ results }) => {
   );
 };
 
-export default SearchResults;
+export default FlightSearchResults;

@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
-const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
+const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departDate, setDepartDate] = useState("");
@@ -101,15 +101,15 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
   };
 
   return (
-    <div className="w-full max-w-6xl  bg-slate-800 p-4 items-center justify-between rounded-lg flex flex-row text-white">
-      <div className="flex flex-grow text-white items-start">
+    <div className="w-full max-w-6xl  bg-slate-800  p-4 items-center justify-between rounded-lg flex flex-row text-white">
+      <div className="flex flex-row text-white items-center">
         {/* From input */}
-        <div className="px-2 w-full md:w-1/5 mb-4">
+        <div className="px-2  mb-4">
           <label
             htmlFor="originField"
             className="block mb-1 text-xs font-medium"
           >
-            From
+            Where are you going?
           </label>
           <input
             type="text"
@@ -127,31 +127,13 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
             </div>
           )}
         </div>
-        {/* To input */}
-        <div className="px-2 w-full md:w-1/5 mb-4">
-          <label
-            htmlFor="destinationField"
-            className="block mb-1 text-xs font-medium0"
-          >
-            To
-          </label>
-          <input
-            type="text"
-            id="destinationField"
-            className="bg-gray-50 text-slate-600 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 h-10"
-            placeholder="Country, city or airport"
-            required
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        </div>
-        {/* Depart date input */}
-        <div className="px-2 w-full md:w-1/5 mb-4">
+
+        <div className="px-2 mb-4">
           <label
             htmlFor="departField"
             className="block mb-1 text-xs font-medium "
           >
-            Depart
+            Check-in date
           </label>
           <input
             type="date"
@@ -162,13 +144,13 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
             onChange={(e) => setDepartDate(e.target.value)}
           />
         </div>
-        {/* Return date input */}
-        <div className="px-2 w-full md:w-1/5 mb-4">
+
+        <div className="px-2  mb-4">
           <label
             htmlFor="returnField"
             className="block mb-1 text-xs font-medium"
           >
-            Return
+            Check-out date
           </label>
           <input
             type="date"
@@ -179,48 +161,50 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
             onChange={(e) => setReturnDate(e.target.value)}
           />
         </div>
-        {/* Travelers select */}
-        <div className="px-2 w-full md:w-1/5 mb-4">
-          <label
-            className="flex flex-col w-24 text-xs font-medium"
-            htmlFor="adultPassengers"
-          >
-            Passengers
+        <div className="text-sm flex items-center gap-3 mb-2 ml-4">
+          <label className="flex flex-col" htmlFor="adultPassengers">
+            Adults
+            <span className="font-light text-xs text-slate-400">
+              (Aged 16+)
+            </span>
           </label>
-          <div htmlFor="passengerSelect" className="border-2 rounded-lg p-2 ">
-            <div className="text-sm flex items-center gap-2 mb-2">
-              <label className="flex flex-col w-24" htmlFor="adultPassengers">
-                Adults{" "}
-                <span className="font-light text-xs text-slate-400">
-                  (Aged 16+)
-                </span>
-              </label>
-              <input
-                type="number"
-                id="adultPassengers"
-                className="w-14 border text-slate-600 rounded-lg p-2"
-                value={adultPassengers}
-                onChange={(e) => setAdultPassengers(Number(e.target.value))}
-                min="1" // Ensure there's at least one adult
-              />
-            </div>
-            <div className="text-sm flex items-center gap-2">
-              <label className="flex flex-col w-24" htmlFor="childPassengers">
-                Children{" "}
-                <span className="font-light text-xs text-slate-400">
-                  (Aged 0 to 15)
-                </span>
-              </label>
-              <input
-                type="number"
-                id="childPassengers"
-                className="w-14 border text-slate-600 rounded-lg p-2"
-                value={childPassengers}
-                onChange={(e) => setChildPassengers(Number(e.target.value))}
-                min="0"
-              />
-            </div>
-          </div>
+          <input
+            type="number"
+            id="adultPassengers"
+            className="w-14 border text-slate-600 rounded-lg p-2 mr-4"
+            value={adultPassengers}
+            onChange={(e) => setAdultPassengers(Number(e.target.value))}
+            min="1" // Ensure there's at least one adult
+          />
+        </div>
+        <div className="text-sm flex items-center gap-2 mb-2">
+          <label className="flex flex-col" htmlFor="adultPassengers">
+            Children
+            <span className="font-light text-xs text-slate-400">
+              (Aged 0-15+)
+            </span>
+          </label>
+          <input
+            type="number"
+            id="adultPassengers"
+            className="w-14 border text-slate-600 rounded-lg p-2 mr-4"
+            value={adultPassengers}
+            onChange={(e) => setAdultPassengers(Number(e.target.value))}
+            min="1" // Ensure there's at least one adult
+          />
+        </div>
+        <div className="text-sm flex items-center gap-2 mb-2">
+          <label className="flex flex-col" htmlFor="adultPassengers">
+            Rooms
+          </label>
+          <input
+            type="number"
+            id="adultPassengers"
+            className="w-14 border text-slate-600 rounded-lg p-2 mr-4"
+            value={adultPassengers}
+            onChange={(e) => setAdultPassengers(Number(e.target.value))}
+            min="1" // Ensure there's at least one adult
+          />
         </div>
       </div>
       <div className="px-2 w-full md:w-auto">
@@ -240,4 +224,4 @@ const FlightSearch = ({ onOffersUpdate, onSearchStart }) => {
     </div>
   );
 };
-export default FlightSearch;
+export default HotelSearch;
