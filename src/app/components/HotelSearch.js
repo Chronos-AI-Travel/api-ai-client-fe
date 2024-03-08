@@ -28,80 +28,50 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
   };
 
   const handleSearchClick = async () => {
-    if (!validateFields()) return; // Stop submission if validation fails
+    // if (!validateFields()) return; // Stop submission if validation fails
 
-    onSearchStart();
-    setIsLoading(true);
+    // onSearchStart(); // Notify parent component that search has started
+    // setIsLoading(true);
 
-    const passengers = [
-      ...Array(adultPassengers).fill({ type: "adult" }),
-      ...Array(childPassengers).fill({ type: "child" }),
-    ];
-
-    const postData = {
-      data: {
-        slices: [
-          {
-            origin: from,
-            destination: to,
-            departure_date: departDate,
-          },
-        ],
-        passengers: passengers,
-      },
+    // Prepare the request payload
+    const requestBody = {
+      checkin: departDate,
+      checkout: returnDate,
+      adults: adultPassengers,
+      rooms: 1, // Assuming 1 room for simplicity, adjust as needed
     };
 
-    if (returnDate) {
-      postData.data.slices.push({
-        origin: to,
-        destination: from,
-        departure_date: returnDate,
-      });
-    }
+    // Log the request payload to the console
+    console.log("Sending to backend:", requestBody);
 
     try {
-      const response = await fetch("http://localhost:5000/get_flight_offers", {
+      const response = await fetch("http://localhost:5000/search_hotels", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(postData),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // errorData contains an "errors" key with an array of strings
-        // Check if errorData.errors is an array and has at least one message
-        if (
-          errorData.errors &&
-          Array.isArray(errorData.errors) &&
-          errorData.errors.length > 0
-        ) {
-          // Since we want to show all error messages, we can directly use errorData.errors array
-          // However, since we're throwing an Error, we need to convert it to a string
-          // We choose to throw the first error message for simplicity
-          throw new Error(errorData.errors[0]);
-        } else {
-          // If the structure is not as expected, throw a generic error message
-          throw new Error("Network response was not ok");
-        }
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
-      onOffersUpdate(data);
+      onOffersUpdate(data); // Update parent component with the search results
     } catch (error) {
-      console.error("Failed to fetch flight offers:", error);
-      // Directly use the error message, which should now be correctly extracted
+      console.error("Failed to fetch:", error);
       setValidationErrors((prevErrors) => ({
         ...prevErrors,
-        submit: error.message, // Assuming error.message is a string
+        submit: error.message,
       }));
-    } finally {
-      setIsLoading(false);
+      // } finally {
+      // setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-6xl  bg-slate-800  p-4 items-center justify-between rounded-lg flex flex-row text-white">
+    <div className="w-full max-w-6xl  bg-slate-800 mb-2 p-4 items-center justify-between rounded-lg flex flex-row text-white">
       <div className="flex flex-row text-white items-center">
         {/* From input */}
         <div className="px-2  mb-4">
