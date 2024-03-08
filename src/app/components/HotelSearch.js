@@ -33,7 +33,7 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
     onSearchStart(); // Notify parent component that search has started
     setIsLoading(true);
   
-    // Adjusted request payload for Agoda's API
+    // Adjusted request payload for the backend API
     const requestBody = {
       location: from, // Assuming 'from' is the location for the hotel search
       checkIn: departDate,
@@ -43,12 +43,13 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
       rooms: 1, // Adjust based on your application's requirements
     };
   
+    console.log("Sending to backend:", requestBody);
+  
     try {
-      const response = await fetch("http://localhost:5000/search_hotels", { // Replace with actual Agoda API endpoint
+      const response = await fetch("/get_hotel_availability", { // Adjust this endpoint as necessary
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_API_KEY" // Replace with actual API key or authentication method
         },
         body: JSON.stringify(requestBody),
       });
@@ -58,6 +59,7 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
       }
   
       const data = await response.json();
+      console.log("Received from backend:", data);
       onOffersUpdate(data); // Update parent component with the search results
     } catch (error) {
       console.error("Failed to fetch:", error);
