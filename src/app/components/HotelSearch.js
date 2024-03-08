@@ -28,35 +28,35 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
   };
 
   const handleSearchClick = async () => {
-    // if (!validateFields()) return; // Stop submission if validation fails
-
-    // onSearchStart(); // Notify parent component that search has started
-    // setIsLoading(true);
-
-    // Prepare the request payload
+    if (!validateFields()) return; // Ensure validation is performed
+  
+    onSearchStart(); // Notify parent component that search has started
+    setIsLoading(true);
+  
+    // Adjusted request payload for Agoda's API
     const requestBody = {
-      checkin: departDate,
-      checkout: returnDate,
+      location: from, // Assuming 'from' is the location for the hotel search
+      checkIn: departDate,
+      checkOut: returnDate,
       adults: adultPassengers,
-      rooms: 1, // Assuming 1 room for simplicity, adjust as needed
+      children: childPassengers,
+      rooms: 1, // Adjust based on your application's requirements
     };
-
-    // Log the request payload to the console
-    console.log("Sending to backend:", requestBody);
-
+  
     try {
-      const response = await fetch("http://localhost:5000/search_hotels", {
+      const response = await fetch("http://localhost:5000/search_hotels", { // Replace with actual Agoda API endpoint
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer YOUR_API_KEY" // Replace with actual API key or authentication method
         },
         body: JSON.stringify(requestBody),
       });
-
+  
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+  
       const data = await response.json();
       onOffersUpdate(data); // Update parent component with the search results
     } catch (error) {
@@ -65,8 +65,8 @@ const HotelSearch = ({ onOffersUpdate, onSearchStart }) => {
         ...prevErrors,
         submit: error.message,
       }));
-      // } finally {
-      // setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
