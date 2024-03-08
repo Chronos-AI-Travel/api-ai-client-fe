@@ -9,6 +9,7 @@ const SearchResults = ({ results }) => {
   const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
   const [selectedOfferPrice, setSelectedOfferPrice] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [adultPassengers, setAdultPassengers] = useState(0);
 
   console.log("searchResults results", results);
 
@@ -28,6 +29,10 @@ const SearchResults = ({ results }) => {
       const totalAmount = offer.slices[0].total_amount; // Assuming the price is here
       setSelectedPassengerIds(passengerIds);
       setSelectedOfferPrice(totalAmount); // Store the price in state
+      setAdultPassengers(passengerIds.length); // Set the number of adult passengers
+  
+      // Log the number of adult passengers
+      console.log("Number of adult passengers:", passengerIds.length);
     }
     setSelectedOfferId(offerId);
     setIsModalOpen(true);
@@ -43,22 +48,23 @@ const SearchResults = ({ results }) => {
         body: JSON.stringify(orderPayload),
       });
       const data = await response.json();
-      if (response.ok) {
-        console.log("Order created successfully:", data);
-        setShowSuccessMessage(true); // Show success message
-        setTimeout(() => setShowSuccessMessage(false), 3000); // Hide after 3 seconds
-      } else {
+      if (!response.ok) {
         console.error("Failed to create order:", data);
+        throw new Error(data.message || "Failed to create order"); // Throw an error if response is not ok
       }
+      console.log("Order created successfully:", data);
+      setShowSuccessMessage(true); // Show success message
+      setTimeout(() => setShowSuccessMessage(false), 3000); // Hide after 3 seconds
     } catch (error) {
       console.error("Error creating order:", error);
+      throw error; // Rethrow the error to be caught by the caller
     }
   };
 
   return (
     <div className="w-full max-w-6xl mx-auto text-left border-2 border-black p-4 rounded-lg bg-gray-50">
       <div className="font-semibold mb-2">Results</div>
-      <div className="text-green-500 mb-2">Booked!</div>
+      {showSuccessMessage && <div className="text-green-500 mb-2">Booked!</div>}
       {results.map((offer, index) => {
         const totalAmount = offer.slices[0].total_amount;
         const baseCurrency = offer.slices[0].base_currency;
@@ -140,7 +146,8 @@ const SearchResults = ({ results }) => {
         onSubmit={handlePassengerDetailsSubmit}
         selectedOfferId={selectedOfferId}
         passengerIds={selectedPassengerIds}
-        price={selectedOfferPrice} // Pass the price to the modal
+        price={selectedOfferPrice}
+        adultPassengers={adultPassengers}
       />
     </div>
   );

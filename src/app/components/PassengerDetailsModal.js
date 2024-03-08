@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const PassengerDetailsModal = ({
   isOpen,
@@ -8,61 +8,74 @@ const PassengerDetailsModal = ({
   passengerIds,
   price,
 }) => {
+  const [passengerDetails, setPassengerDetails] = useState([]);
   const [errors, setErrors] = useState({});
+  const [submissionError, setSubmissionError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [passengerDetails, setPassengerDetails] = useState({
-    given_name: "",
-    family_name: "",
-    born_on: "",
-    email: "",
-    phone: "",
-    gender: "m",
-    title: "mr",
-  });
+  useEffect(() => {
+    // Dynamically set the initial state based on passengerIds length
+    const initialPassengerDetails = passengerIds.map(() => ({
+      given_name: "",
+      family_name: "",
+      born_on: "",
+      email: "",
+      phone: "",
+      gender: "m",
+      title: "mr",
+    }));
+    setPassengerDetails(initialPassengerDetails);
+  }, [passengerIds]); // Depend on passengerIds
 
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
-    setPassengerDetails({
-      ...passengerDetails,
+  const handleChange = (index, e) => {
+    const updatedPassengers = [...passengerDetails];
+    updatedPassengers[index] = {
+      ...updatedPassengers[index],
       [e.target.name]: e.target.value,
-    });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: null });
-    }
+    };
+    setPassengerDetails(updatedPassengers);
   };
 
   const validateFields = () => {
     const newErrors = {};
-    // Example validation: check if the given_name field is empty
-    if (!passengerDetails.given_name.trim()) {
-      newErrors.given_name = "Error with this field";
-    }
+    let isValid = true;
+
+    passengerDetails.forEach((passenger, index) => {
+      if (!passenger.given_name.trim()) {
+        isValid = false;
+        newErrors[`given_name_${index}`] = "Given name is required";
+      }
+    });
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return isValid; // Return true if all fields are valid
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateFields()) {
       return; // Stop the submission if there are validation errors
     }
+
+    setIsSubmitting(true); // Indicate that submission is in progress
+
+    // Adjusted to map over all passengerDetails and construct the passengers array
     const orderPayload = {
       data: {
         type: "instant",
         selected_offers: [selectedOfferId],
-        passengers: [
-          {
-            phone_number: passengerDetails.phone,
-            email: passengerDetails.email,
-            born_on: passengerDetails.born_on,
-            title: passengerDetails.title,
-            gender: passengerDetails.gender,
-            family_name: passengerDetails.family_name,
-            given_name: passengerDetails.given_name,
-            id: passengerIds[0],
-          },
-        ],
+        passengers: passengerDetails.map((passenger, index) => ({
+          phone_number: passenger.phone,
+          email: passenger.email,
+          born_on: passenger.born_on,
+          title: passenger.title,
+          gender: passenger.gender,
+          family_name: passenger.family_name,
+          given_name: passenger.given_name,
+          id: passengerIds[index],
+        })),
         payments: [
           {
             currency: "GBP",
@@ -72,133 +85,114 @@ const PassengerDetailsModal = ({
         ],
       },
     };
-    console.log("Submitting order with payload:", orderPayload); // Log the payload
-    onSubmit(orderPayload);
-    onClose(); 
+
+    try {
+      await onSubmit(orderPayload);
+      onClose(); // Close the modal only if submission was successful
+    } catch (error) {
+      console.error("Submission failed:", error);
+      setSubmissionError("Failed to book. Please try again."); // Show error message
+    } finally {
+      setIsSubmitting(false); // Submission attempt is finished, allow new attempts
+    }
   };
 
   return (
     <div
-      className="w-2/3 h-fit font-montserrat border-2 rounded-lg border-slate-800"
+      className="w-11/12 bg-slate-800 text-white font-montserrat border-4 shadow-lg shadow-slate-800 rounded-lg border-slate-800"
       style={{
         position: "fixed",
-        top: "20%",
-        left: "30%",
-        backgroundColor: "white",
+        top: "3%",
+        left: "3%",
         padding: "20px",
         zIndex: 100,
+        maxHeight: "90vh", // Set a maximum height
+
+        overflowY: "auto", // Enable vertical scrolling
       }}
     >
-      <p className="text-2xl font-light mb-6">Enter Passenger Details</p>
-      <form
-        className="flex flex-wrap w-full gap-4 text-sm"
-        onSubmit={handleSubmit}
-      >
-        <div className="flex-1 min-w-1/2">
-          <label className="text-xs flex flex-col">
-            Given Name
-            <input
-              type="text"
-              name="given_name"
-              value={passengerDetails.given_name}
-              onChange={handleChange}
-              className="border mb-4 rounded-lg p-2 text-sm w-full"
-            />
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-          <label className="text-xs flex flex-col">
-            Title
+      <p className="text-2xl font-light pb-6 mb-4 border-b-2">
+        Enter Passenger Details
+      </p>
+      {submissionError && <div className="text-red-500">{submissionError}</div>}
+
+      <form onSubmit={handleSubmit}>
+        {passengerDetails.map((passenger, index) => (
+          <div
+            key={index}
+            className="mb-4 border-b border-slate-400 bg-slate-600 rounded-lg p-4 flex flex-col pb-3"
+          >
+            <p className="text-lg font-normal mb-2">Passenger {index + 1}</p>
             <select
               name="title"
-              value={passengerDetails.title}
-              onChange={handleChange}
-              className="border rounded-lg p-2 text-sm w-full"
+              placeholder="Title"
+              value={passenger.title} // Corrected to use passenger.title
+              onChange={(e) => handleChange(index, e)} // Corrected to pass index
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
             >
               <option value="mr">Mr</option>
               <option value="mrs">Mrs</option>
             </select>
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-          <label className="text-xs flex flex-col">
-            Family Name:
             <input
               type="text"
-              name="family_name"
-              value={passengerDetails.family_name}
-              onChange={handleChange}
-              className="border  rounded-lg p-2 text-sm w-full"
+              name="given_name"
+              value={passenger.given_name}
+              onChange={(e) => handleChange(index, e)}
+              placeholder="Given Name"
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
             />
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-        </div>
-        <div className="flex-1 min-w-1/2">
-          <label className="text-xs flex flex-col">
-            Gender:
+            <input
+              type="text"
+              placeholder="Family Name"
+              name="family_name"
+              value={passenger.family_name}
+              onChange={(e) => handleChange(index, e)}
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
+            />
             <select
               name="gender"
-              value={passengerDetails.gender}
-              onChange={handleChange}
-              className="border rounded-lg p-2 text-sm w-full"
+              value={passenger.gender} // Corrected to use passenger.gender
+              onChange={(e) => handleChange(index, e)} // Corrected to pass index
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
             >
               <option value="m">Male</option>
               <option value="f">Female</option>
             </select>
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-          <label className="text-xs flex flex-col">
-            Date of Birth:
-            <input
-              type="date"
-              name="born_on"
-              value={passengerDetails.born_on}
-              onChange={handleChange}
-              className="border  rounded-lg p-2 text-sm w-full"
-            />
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-          <label className="text-xs flex flex-col">
-            Email:
+            <label className="text-xs flex flex-col">
+              Date of Birth:
+              <input
+                type="date"
+                name="born_on"
+                value={passenger.born_on}
+                onChange={(e) => handleChange(index, e)}
+                className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
+              />
+            </label>
             <input
               type="email"
               name="email"
-              value={passengerDetails.email}
-              onChange={handleChange}
-              className="border  rounded-lg p-2 text-sm w-full"
+              placeholder="Email"
+              value={passenger.email}
+              onChange={(e) => handleChange(index, e)}
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
             />
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-          <label className="text-xs flex flex-col">
-            Phone (must include country code i.e. +44):
             <input
               type="text"
               name="phone"
-              value={passengerDetails.phone}
-              onChange={handleChange}
-              className="border  rounded-lg p-2 text-sm w-full"
+              placeholder="Phone (must include country code i.e. +44)"
+              value={passenger.phone}
+              onChange={(e) => handleChange(index, e)}
+              className="border text-slate-800 rounded-lg p-2 text-sm w-full mb-2"
             />
-            {errors.given_name && (
-              <p className="text-red-500 text-xs">{errors.given_name}</p>
-            )}
-          </label>
-        </div>
+          </div>
+        ))}
         <div className="w-full flex justify-between items-center pt-4">
           <button
             className="bg-blue-400 rounded-lg p-2 text-white mb-2"
             type="submit"
+            disabled={isSubmitting}
           >
-            Pay & Book
+            {isSubmitting ? "Booking..." : "Pay & Book"}
           </button>
           <span className="text-sm font-bold">£{price}</span>
           <button
